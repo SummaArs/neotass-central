@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "1.0.0",
+  "appCode": "neotass-projetos",
+  "runtime": "ooncore-node-react",
+  "components": {
+    "backend": { "path": "backend" },
+    "frontend": { "path": "frontend" }
+  },
+  "resourceProfile": "small",
+  "capabilities": {},
+  "health": {
+    "livePath": "/health/live",
+    "readyPath": "/api/ativacao/status",
+    "versionPath": "/api/ativacao/status"
+  }
+}

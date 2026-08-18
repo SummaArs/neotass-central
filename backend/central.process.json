@@ -1,0 +1,409 @@
+{
+  "schemaVersion": 1,
+  "models": {
+    "Departamento": {
+      "deleteProtection": [
+        {
+          "sourceModel": "Projeto",
+          "foreignField": "departamento",
+          "message": "Não é possível excluir um departamento com projeto vinculado."
+        }
+      ]
+    },
+    "Cliente": {
+      "deleteProtection": [
+        {
+          "sourceModel": "Projeto",
+          "foreignField": "cliente",
+          "message": "Não é possível excluir um cliente que já tem projeto."
+        }
+      ]
+    },
+    "Projeto": {
+      "bindings": [
+        {
+          "field": "codigoDepartamento",
+          "kind": "lookup",
+          "recalculate": "immediate",
+          "sourceModel": "Departamento",
+          "localField": "departamento",
+          "sourceField": "codigo",
+          "watchFields": [
+            "codigo"
+          ]
+        },
+        {
+          "field": "custoComprometido",
+          "kind": "aggregate",
+          "recalculate": "immediate",
+          "sourceModel": "ContaPagar",
+          "foreignField": "projeto",
+          "operator": "sum",
+          "sourceField": "valor",
+          "match": {
+            "situacao": {
+              "neq": "Cancelada"
+            }
+          },
+          "watchFields": [
+            "valor",
+            "situacao"
+          ]
+        },
+        {
+          "field": "saldoDeCompra",
+          "kind": "expression",
+          "recalculate": "immediate",
+          "expression": {
+            "op": "subtract",
+            "args": [
+              {
+                "field": "custoAprovado"
+              },
+              {
+                "field": "custoComprometido"
+              }
+            ]
+          },
+          "watchFields": [
+            "custoAprovado",
+            "custoComprometido"
+          ]
+        },
+        {
+          "field": "receitaSolicitada",
+          "kind": "aggregate",
+          "recalculate": "immediate",
+          "sourceModel": "SolicitacaoFaturamento",
+          "foreignField": "projeto",
+          "operator": "sum",
+          "sourceField": "valor",
+          "match": {
+            "situacao": {
+              "neq": "Recusada"
+            }
+          },
+          "watchFields": [
+            "valor",
+            "situacao"
+          ]
+        },
+        {
+          "field": "receitaFaturada",
+          "kind": "aggregate",
+          "recalculate": "immediate",
+          "sourceModel": "SolicitacaoFaturamento",
+          "foreignField": "projeto",
+          "operator": "sum",
+          "sourceField": "valor",
+          "match": {
+            "situacao": {
+              "eq": "Faturada"
+            }
+          },
+          "watchFields": [
+            "valor",
+            "situacao"
+          ]
+        },
+        {
+          "field": "margemPrevista",
+          "kind": "expression",
+          "recalculate": "immediate",
+          "expression": {
+            "op": "subtract",
+            "args": [
+              {
+                "field": "receitaAprovada"
+              },
+              {
+                "field": "custoAprovado"
+              }
+            ]
+          },
+          "watchFields": [
+            "receitaAprovada",
+            "custoAprovado"
+          ]
+        },
+        {
+          "field": "margemRealizada",
+          "kind": "expression",
+          "recalculate": "immediate",
+          "expression": {
+            "op": "subtract",
+            "args": [
+              {
+                "field": "receitaFaturada"
+              },
+              {
+                "field": "custoComprometido"
+              }
+            ]
+          },
+          "watchFields": [
+            "receitaFaturada",
+            "custoComprometido"
+          ]
+        }
+      ],
+      "workflow": {
+        "stageField": "situacao",
+        "transitions": [
+          {
+            "from": "Em orçamento",
+            "to": "Aprovado"
+          },
+          {
+            "from": "Aprovado",
+            "to": "Em execução"
+          },
+          {
+            "from": "Em execução",
+            "to": "Encerrado"
+          },
+          {
+            "from": "Em orçamento",
+            "to": "Cancelado"
+          }
+        ]
+      },
+      "deleteProtection": [
+        {
+          "sourceModel": "ContaPagar",
+          "foreignField": "projeto",
+          "message": "Não é possível excluir um projeto que já tem conta a pagar."
+        }
+      ]
+    },
+    "ContaPagar": {
+      "atomicInvariants": [
+        {
+          "name": "ContaPagar_valor_lte_Projeto_custoAprovado",
+          "kind": "relatedSumLteParentField",
+          "parentModel": "Projeto",
+          "parentLocalField": "projeto",
+          "sourceField": "valor",
+          "parentField": "custoAprovado",
+          "message": "A soma das contas a pagar não pode ultrapassar o custo aprovado do projeto.",
+          "match": {
+            "situacao": {
+              "neq": "Cancelada"
+            }
+          }
+        }
+      ],
+      "bindings": [
+        {
+          "field": "codigoProjeto",
+          "kind": "lookup",
+          "recalculate": "immediate",
+          "sourceModel": "Projeto",
+          "localField": "projeto",
+          "sourceField": "codigo",
+          "watchFields": [
+            "codigo"
+          ]
+        },
+        {
+          "field": "codigoDepartamento",
+          "kind": "lookup",
+          "recalculate": "immediate",
+          "sourceModel": "Projeto",
+          "localField": "projeto",
+          "sourceField": "codigoDepartamento",
+          "watchFields": [
+            "codigoDepartamento"
+          ]
+        }
+      ]
+    },
+    "SolicitacaoFaturamento": {
+      "atomicInvariants": [
+        {
+          "name": "SolicitacaoFaturamento_valor_lte_Projeto_receitaAprovada",
+          "kind": "relatedSumLteParentField",
+          "parentModel": "Projeto",
+          "parentLocalField": "projeto",
+          "sourceField": "valor",
+          "parentField": "receitaAprovada",
+          "message": "Não é possível solicitar faturamento acima da receita aprovada pelo cliente neste projeto.",
+          "match": {
+            "situacao": {
+              "neq": "Recusada"
+            }
+          }
+        }
+      ],
+      "bindings": [
+        {
+          "field": "codigoProjeto",
+          "kind": "lookup",
+          "recalculate": "immediate",
+          "sourceModel": "Projeto",
+          "localField": "projeto",
+          "sourceField": "codigo",
+          "watchFields": [
+            "codigo"
+          ]
+        },
+        {
+          "field": "codigoDepartamento",
+          "kind": "lookup",
+          "recalculate": "immediate",
+          "sourceModel": "Projeto",
+          "localField": "projeto",
+          "sourceField": "codigoDepartamento",
+          "watchFields": [
+            "codigoDepartamento"
+          ]
+        }
+      ],
+      "workflow": {
+        "stageField": "situacao",
+        "transitions": [
+          {
+            "from": "Rascunho",
+            "to": "Em aprovação"
+          },
+          {
+            "from": "Em aprovação",
+            "to": "Aprovada"
+          },
+          {
+            "from": "Aprovada",
+            "to": "Enviada ao ERP"
+          },
+          {
+            "from": "Enviada ao ERP",
+            "to": "Faturada"
+          },
+          {
+            "from": "Em aprovação",
+            "to": "Recusada"
+          }
+        ]
+      }
+    },
+    "Fornecedor": {
+      "workflow": {
+        "stageField": "situacao",
+        "transitions": [
+          {
+            "from": "Recebido",
+            "to": "Em análise"
+          },
+          {
+            "from": "Em análise",
+            "to": "Aprovado"
+          },
+          {
+            "from": "Aprovado",
+            "to": "Enviado ao ERP"
+          },
+          {
+            "from": "Em análise",
+            "to": "Recusado"
+          }
+        ]
+      },
+      "deleteProtection": [
+        {
+          "sourceModel": "Cotacao",
+          "foreignField": "fornecedor",
+          "message": "Não é possível excluir um fornecedor que já foi cotado."
+        }
+      ]
+    },
+    "SolicitacaoCompra": {
+      "bindings": [
+        {
+          "field": "codigoProjeto",
+          "kind": "lookup",
+          "recalculate": "immediate",
+          "sourceModel": "Projeto",
+          "localField": "projeto",
+          "sourceField": "codigo",
+          "watchFields": [
+            "codigo"
+          ]
+        },
+        {
+          "field": "codigoDepartamento",
+          "kind": "lookup",
+          "recalculate": "immediate",
+          "sourceModel": "Projeto",
+          "localField": "projeto",
+          "sourceField": "codigoDepartamento",
+          "watchFields": [
+            "codigoDepartamento"
+          ]
+        },
+        {
+          "field": "cotacoesRecebidas",
+          "kind": "aggregate",
+          "recalculate": "immediate",
+          "sourceModel": "Cotacao",
+          "foreignField": "solicitacao",
+          "operator": "count"
+        },
+        {
+          "field": "menorCotacao",
+          "kind": "aggregate",
+          "recalculate": "immediate",
+          "sourceModel": "Cotacao",
+          "foreignField": "solicitacao",
+          "operator": "min",
+          "sourceField": "valor"
+        }
+      ],
+      "workflow": {
+        "stageField": "situacao",
+        "transitions": [
+          {
+            "from": "Rascunho",
+            "to": "Cotando"
+          },
+          {
+            "from": "Cotando",
+            "to": "Em aprovação"
+          },
+          {
+            "from": "Em aprovação",
+            "to": "Aprovada"
+          },
+          {
+            "from": "Aprovada",
+            "to": "Comprada"
+          },
+          {
+            "from": "Em aprovação",
+            "to": "Reprovada"
+          }
+        ]
+      },
+      "deleteProtection": [
+        {
+          "sourceModel": "Cotacao",
+          "foreignField": "solicitacao",
+          "message": "Não é possível excluir uma solicitação que já tem cotação."
+        }
+      ]
+    },
+    "Cotacao": {
+      "bindings": [
+        {
+          "field": "fornecedorNome",
+          "kind": "lookup",
+          "recalculate": "immediate",
+          "sourceModel": "Fornecedor",
+          "localField": "fornecedor",
+          "sourceField": "razaoSocial",
+          "watchFields": [
+            "razaoSocial"
+          ]
+        }
+      ]
+    }
+  }
+}

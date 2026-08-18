@@ -1,0 +1,756 @@
+{
+  "schemaVersion": 1,
+  "name": "neotass-projetos",
+  "slug": "neotass-projetos",
+  "models": [
+    {
+      "name": "Departamento",
+      "fields": {
+        "codigo": {
+          "kind": "string",
+          "label": "Código no Omie",
+          "required": true,
+          "unique": true,
+          "searchable": true
+        },
+        "nome": {
+          "kind": "string",
+          "label": "Departamento",
+          "required": true,
+          "searchable": true
+        },
+        "situacao": {
+          "kind": "enum",
+          "label": "Situação",
+          "required": true,
+          "index": true,
+          "values": [
+            "Ativo",
+            "Inativo"
+          ],
+          "default": "Ativo"
+        }
+      },
+      "basePath": "/departamentos",
+      "crud": {
+        "enabled": true,
+        "populateRefs": true
+      }
+    },
+    {
+      "name": "Cliente",
+      "fields": {
+        "nome": {
+          "kind": "string",
+          "label": "Cliente",
+          "required": true,
+          "searchable": true
+        },
+        "razaoSocial": {
+          "kind": "string",
+          "label": "Razão social"
+        },
+        "cnpj": {
+          "kind": "string",
+          "label": "CNPJ",
+          "required": true,
+          "unique": true,
+          "searchable": true
+        },
+        "codigoOmie": {
+          "kind": "string",
+          "label": "Código no Omie"
+        },
+        "responsavel": {
+          "kind": "string",
+          "label": "Atendimento responsável",
+          "index": true
+        },
+        "situacao": {
+          "kind": "enum",
+          "label": "Situação",
+          "required": true,
+          "index": true,
+          "values": [
+            "Ativo",
+            "Inativo"
+          ],
+          "default": "Ativo"
+        }
+      },
+      "basePath": "/clientes",
+      "crud": {
+        "enabled": true,
+        "populateRefs": true
+      }
+    },
+    {
+      "name": "Projeto",
+      "fields": {
+        "codigo": {
+          "kind": "string",
+          "label": "Código do projeto",
+          "required": true,
+          "unique": true,
+          "searchable": true
+        },
+        "nome": {
+          "kind": "string",
+          "label": "Projeto",
+          "required": true,
+          "searchable": true
+        },
+        "cliente": {
+          "kind": "ref",
+          "label": "Cliente",
+          "required": true,
+          "index": true,
+          "ref": "Cliente"
+        },
+        "departamento": {
+          "kind": "ref",
+          "label": "Departamento",
+          "required": true,
+          "index": true,
+          "ref": "Departamento"
+        },
+        "codigoDepartamento": {
+          "kind": "string",
+          "label": "Código do departamento"
+        },
+        "tipo": {
+          "kind": "enum",
+          "label": "Tipo",
+          "required": true,
+          "index": true,
+          "values": [
+            "Evento",
+            "Campanha",
+            "Mídia",
+            "Produção",
+            "Outro"
+          ],
+          "default": "Evento"
+        },
+        "dataInicio": {
+          "kind": "date",
+          "label": "Início",
+          "required": true,
+          "index": true
+        },
+        "dataFim": {
+          "kind": "date",
+          "label": "Encerramento"
+        },
+        "receitaAprovada": {
+          "kind": "currency",
+          "label": "Receita aprovada pelo cliente (PO)",
+          "required": true
+        },
+        "custoAprovado": {
+          "kind": "currency",
+          "label": "Custo aprovado do projeto",
+          "required": true
+        },
+        "custoComprometido": {
+          "kind": "currency",
+          "label": "Custo comprometido"
+        },
+        "saldoDeCompra": {
+          "kind": "currency",
+          "label": "Saldo para comprar"
+        },
+        "receitaSolicitada": {
+          "kind": "currency",
+          "label": "Receita solicitada"
+        },
+        "receitaFaturada": {
+          "kind": "currency",
+          "label": "Receita faturada"
+        },
+        "margemPrevista": {
+          "kind": "currency",
+          "label": "Margem prevista"
+        },
+        "margemRealizada": {
+          "kind": "currency",
+          "label": "Margem realizada"
+        },
+        "situacao": {
+          "kind": "enum",
+          "label": "Situação",
+          "required": true,
+          "index": true,
+          "values": [
+            "Em orçamento",
+            "Aprovado",
+            "Em execução",
+            "Encerrado",
+            "Cancelado"
+          ],
+          "default": "Em orçamento"
+        }
+      },
+      "basePath": "/projetos",
+      "crud": {
+        "enabled": true,
+        "populateRefs": true
+      }
+    },
+    {
+      "name": "RegraAlcada",
+      "fields": {
+        "nome": {
+          "kind": "string",
+          "label": "Faixa",
+          "required": true,
+          "unique": true,
+          "searchable": true
+        },
+        "aplicaA": {
+          "kind": "enum",
+          "label": "Aplica-se a",
+          "required": true,
+          "index": true,
+          "values": [
+            "Compra",
+            "Faturamento",
+            "Ambos"
+          ],
+          "default": "Ambos"
+        },
+        "valorMinimo": {
+          "kind": "currency",
+          "label": "Valor mínimo",
+          "required": true
+        },
+        "valorMaximo": {
+          "kind": "currency",
+          "label": "Valor máximo",
+          "required": true
+        },
+        "papelExigido": {
+          "kind": "enum",
+          "label": "Quem precisa aprovar",
+          "required": true,
+          "index": true,
+          "values": [
+            "Coordenação",
+            "Gerência",
+            "CFO",
+            "Diretoria"
+          ]
+        },
+        "exigeDoisAprovadores": {
+          "kind": "boolean",
+          "label": "Exige dois aprovadores",
+          "required": true,
+          "index": true,
+          "default": false
+        },
+        "situacao": {
+          "kind": "enum",
+          "label": "Situação",
+          "required": true,
+          "index": true,
+          "values": [
+            "Ativa",
+            "Inativa"
+          ],
+          "default": "Ativa"
+        }
+      },
+      "singular": "regraAlcada",
+      "basePath": "/alcadas",
+      "crud": {
+        "enabled": true,
+        "populateRefs": true
+      }
+    },
+    {
+      "name": "Fornecedor",
+      "fields": {
+        "razaoSocial": {
+          "kind": "string",
+          "label": "Razão social",
+          "required": true,
+          "searchable": true
+        },
+        "cnpjCpf": {
+          "kind": "string",
+          "label": "CNPJ / CPF",
+          "required": true,
+          "unique": true,
+          "searchable": true
+        },
+        "origem": {
+          "kind": "enum",
+          "label": "Origem",
+          "required": true,
+          "index": true,
+          "values": [
+            "Formulário público",
+            "Cadastro interno"
+          ],
+          "default": "Formulário público"
+        },
+        "email": {
+          "kind": "string",
+          "label": "E-mail"
+        },
+        "nomeFantasia": {
+          "kind": "string",
+          "label": "Nome fantasia",
+          "searchable": true
+        },
+        "telefone": {
+          "kind": "string",
+          "label": "Telefone"
+        },
+        "banco": {
+          "kind": "string",
+          "label": "Banco"
+        },
+        "agencia": {
+          "kind": "string",
+          "label": "Agência"
+        },
+        "conta": {
+          "kind": "string",
+          "label": "Conta"
+        },
+        "tipoConta": {
+          "kind": "enum",
+          "label": "Tipo de conta",
+          "values": [
+            "Corrente",
+            "Poupança"
+          ]
+        },
+        "tipoChavePix": {
+          "kind": "enum",
+          "label": "Tipo de chave PIX",
+          "values": [
+            "CNPJ",
+            "CPF",
+            "E-mail",
+            "Telefone",
+            "Aleatória"
+          ]
+        },
+        "chavePix": {
+          "kind": "string",
+          "label": "Chave PIX"
+        },
+        "codigoOmie": {
+          "kind": "string",
+          "label": "Código no Omie"
+        },
+        "motivoRecusa": {
+          "kind": "string",
+          "label": "Motivo da recusa"
+        },
+        "situacao": {
+          "kind": "enum",
+          "label": "Situação",
+          "required": true,
+          "index": true,
+          "values": [
+            "Recebido",
+            "Em análise",
+            "Aprovado",
+            "Enviado ao ERP",
+            "Recusado"
+          ],
+          "default": "Recebido"
+        }
+      },
+      "basePath": "/fornecedores",
+      "crud": {
+        "enabled": true,
+        "populateRefs": true
+      }
+    },
+    {
+      "name": "SolicitacaoCompra",
+      "fields": {
+        "descricao": {
+          "kind": "string",
+          "label": "Item ou serviço",
+          "required": true,
+          "searchable": true
+        },
+        "projeto": {
+          "kind": "ref",
+          "label": "Projeto",
+          "required": true,
+          "index": true,
+          "ref": "Projeto"
+        },
+        "valorEstimado": {
+          "kind": "currency",
+          "label": "Valor estimado",
+          "required": true
+        },
+        "papelExigido": {
+          "kind": "enum",
+          "label": "Alçada exigida",
+          "index": true,
+          "values": [
+            "Coordenação",
+            "Gerência",
+            "CFO",
+            "Diretoria"
+          ]
+        },
+        "numero": {
+          "kind": "string",
+          "label": "Número",
+          "required": true,
+          "unique": true,
+          "searchable": true
+        },
+        "codigoProjeto": {
+          "kind": "string",
+          "label": "Código do projeto"
+        },
+        "codigoDepartamento": {
+          "kind": "string",
+          "label": "Código do departamento"
+        },
+        "categoria": {
+          "kind": "enum",
+          "label": "Categoria",
+          "required": true,
+          "index": true,
+          "values": [
+            "Locação",
+            "Alimentação",
+            "Produção",
+            "Cenografia",
+            "Transporte",
+            "Mídia",
+            "Cachê",
+            "Brindes",
+            "Outro"
+          ]
+        },
+        "comprador": {
+          "kind": "string",
+          "label": "Comprador",
+          "required": true,
+          "index": true
+        },
+        "cotacoesRecebidas": {
+          "kind": "number",
+          "label": "Cotações recebidas"
+        },
+        "menorCotacao": {
+          "kind": "currency",
+          "label": "Menor cotação"
+        },
+        "valorAprovado": {
+          "kind": "currency",
+          "label": "Valor aprovado"
+        },
+        "justificativaEscolha": {
+          "kind": "string",
+          "label": "Justificativa da escolha"
+        },
+        "aprovadoPor": {
+          "kind": "string",
+          "label": "Aprovado por"
+        },
+        "aprovadoEm": {
+          "kind": "date",
+          "label": "Aprovado em"
+        },
+        "idMonday": {
+          "kind": "string",
+          "label": "Item no Monday",
+          "index": true
+        },
+        "situacao": {
+          "kind": "enum",
+          "label": "Situação",
+          "required": true,
+          "index": true,
+          "values": [
+            "Rascunho",
+            "Cotando",
+            "Em aprovação",
+            "Aprovada",
+            "Comprada",
+            "Reprovada"
+          ],
+          "default": "Rascunho"
+        }
+      },
+      "singular": "solicitacaoCompra",
+      "basePath": "/compras",
+      "crud": {
+        "enabled": true,
+        "populateRefs": true
+      }
+    },
+    {
+      "name": "Cotacao",
+      "fields": {
+        "solicitacao": {
+          "kind": "ref",
+          "label": "Solicitação de compra",
+          "required": true,
+          "index": true,
+          "ref": "SolicitacaoCompra"
+        },
+        "fornecedor": {
+          "kind": "ref",
+          "label": "Fornecedor",
+          "required": true,
+          "index": true,
+          "ref": "Fornecedor"
+        },
+        "fornecedorNome": {
+          "kind": "string",
+          "label": "Fornecedor"
+        },
+        "valor": {
+          "kind": "currency",
+          "label": "Valor cotado",
+          "required": true
+        },
+        "prazoDias": {
+          "kind": "number",
+          "label": "Prazo de entrega (dias)"
+        },
+        "condicaoPagamento": {
+          "kind": "string",
+          "label": "Condição de pagamento"
+        },
+        "escolhida": {
+          "kind": "boolean",
+          "label": "Escolhida",
+          "required": true,
+          "index": true,
+          "default": false
+        },
+        "observacao": {
+          "kind": "string",
+          "label": "Observação"
+        }
+      },
+      "basePath": "/cotacoes",
+      "crud": {
+        "enabled": true,
+        "populateRefs": true
+      }
+    },
+    {
+      "name": "ContaPagar",
+      "fields": {
+        "numero": {
+          "kind": "string",
+          "label": "Número",
+          "required": true,
+          "unique": true,
+          "searchable": true
+        },
+        "projeto": {
+          "kind": "ref",
+          "label": "Projeto",
+          "required": true,
+          "index": true,
+          "ref": "Projeto"
+        },
+        "codigoProjeto": {
+          "kind": "string",
+          "label": "Código do projeto"
+        },
+        "codigoDepartamento": {
+          "kind": "string",
+          "label": "Código do departamento"
+        },
+        "solicitacao": {
+          "kind": "ref",
+          "label": "Solicitação de compra",
+          "index": true,
+          "ref": "SolicitacaoCompra"
+        },
+        "fornecedor": {
+          "kind": "ref",
+          "label": "Fornecedor",
+          "required": true,
+          "index": true,
+          "ref": "Fornecedor"
+        },
+        "descricao": {
+          "kind": "string",
+          "label": "Descrição",
+          "required": true,
+          "searchable": true
+        },
+        "categoriaFinanceira": {
+          "kind": "string",
+          "label": "Categoria no Omie",
+          "required": true
+        },
+        "valor": {
+          "kind": "currency",
+          "label": "Valor",
+          "required": true
+        },
+        "vencimento": {
+          "kind": "date",
+          "label": "Vencimento",
+          "required": true,
+          "index": true
+        },
+        "codigoLancamento": {
+          "kind": "string",
+          "label": "Lançamento no Omie"
+        },
+        "ultimoErro": {
+          "kind": "string",
+          "label": "Último erro do Omie"
+        },
+        "situacao": {
+          "kind": "enum",
+          "label": "Situação",
+          "required": true,
+          "index": true,
+          "values": [
+            "A enviar",
+            "Enviada",
+            "Confirmada",
+            "Com erro",
+            "Cancelada"
+          ],
+          "default": "A enviar"
+        }
+      },
+      "singular": "contaPagar",
+      "basePath": "/contas-a-pagar",
+      "crud": {
+        "enabled": true,
+        "populateRefs": true
+      }
+    },
+    {
+      "name": "SolicitacaoFaturamento",
+      "fields": {
+        "numero": {
+          "kind": "string",
+          "label": "Número",
+          "required": true,
+          "unique": true,
+          "searchable": true
+        },
+        "projeto": {
+          "kind": "ref",
+          "label": "Projeto",
+          "required": true,
+          "index": true,
+          "ref": "Projeto"
+        },
+        "valor": {
+          "kind": "currency",
+          "label": "Valor",
+          "required": true
+        },
+        "papelExigido": {
+          "kind": "enum",
+          "label": "Alçada exigida",
+          "index": true,
+          "values": [
+            "Coordenação",
+            "Gerência",
+            "CFO",
+            "Diretoria"
+          ]
+        },
+        "codigoProjeto": {
+          "kind": "string",
+          "label": "Código do projeto"
+        },
+        "codigoDepartamento": {
+          "kind": "string",
+          "label": "Código do departamento"
+        },
+        "descricaoServicos": {
+          "kind": "string",
+          "label": "Descrição dos serviços",
+          "required": true,
+          "searchable": true
+        },
+        "condicaoPagamento": {
+          "kind": "enum",
+          "label": "Condição de pagamento",
+          "required": true,
+          "values": [
+            "À vista",
+            "15 dias",
+            "30 dias",
+            "30/60",
+            "30/60/90",
+            "Personalizada"
+          ]
+        },
+        "dataPrevistaFaturamento": {
+          "kind": "date",
+          "label": "Previsão de faturamento",
+          "index": true
+        },
+        "aprovadoPor": {
+          "kind": "string",
+          "label": "Aprovado por"
+        },
+        "aprovadoEm": {
+          "kind": "date",
+          "label": "Aprovado em"
+        },
+        "numeroOs": {
+          "kind": "string",
+          "label": "O.S. no Omie"
+        },
+        "numeroNfse": {
+          "kind": "string",
+          "label": "Número da NFS-e"
+        },
+        "linkNfse": {
+          "kind": "string",
+          "label": "PDF da NFS-e"
+        },
+        "ultimoErro": {
+          "kind": "string",
+          "label": "Último erro do Omie"
+        },
+        "idMonday": {
+          "kind": "string",
+          "label": "Item no Monday",
+          "index": true
+        },
+        "situacao": {
+          "kind": "enum",
+          "label": "Situação",
+          "required": true,
+          "index": true,
+          "values": [
+            "Rascunho",
+            "Em aprovação",
+            "Aprovada",
+            "Enviada ao ERP",
+            "Faturada",
+            "Recusada"
+          ],
+          "default": "Rascunho"
+        }
+      },
+      "singular": "solicitacaoFaturamento",
+      "basePath": "/faturamento",
+      "crud": {
+        "enabled": true,
+        "populateRefs": true
+      }
+    }
+  ]
+}
