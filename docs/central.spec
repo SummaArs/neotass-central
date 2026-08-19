@@ -22,7 +22,7 @@ central neotass-projetos
   ativacao-campo quadroFaturamento text "ID do quadro de Faturamento no Monday"
   ativacao-campo emailFinanceiro text "E-mail do Financeiro para pendências"
 
-painel visao /visao-geral "A operação hoje" Início
+painel visao / "A operação hoje" Início
   ordem 1
   icone 📊
   indicador soma Projeto.receitaAprovada "Receita aprovada pelos clientes"
