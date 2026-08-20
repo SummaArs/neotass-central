@@ -25,12 +25,45 @@ Precisa de MongoDB em **replica set** (invariante atômico roda em transação).
 | 📊 | A operação hoje | 12 indicadores: quanto entra, quanto sobra, o que está parado |
 | 📖 | Como operar | tutorial de uma tela |
 | 🛒 | Compras | quadro + lista + criar, com mapa de cotações dentro do cartão |
-| 🧾 | Faturamento | solicitação de O.S. com alçada por faixa de valor |
+| 🧾 | Faturamento | quadro **Novo → Em Análise Gestor → Faturar → Faturado**, com alçada por faixa |
 | 🤝 | Fornecedores | fila do que chegou pelo formulário público |
 | 🎪 | Projetos | o DRE de cada evento |
 | 💸 | Contas a pagar | o que foi ao Omie e o que deu erro |
 | 🗂 | Cadastros | cliente, departamento e alçada, numa página só |
 | 🔌 | Conexão com o Omie | credenciais e fila de integração (nativo do Core) |
+
+## O quadro do Monday, campo a campo
+
+O desenho da Neotass (Monday ➔ ponte ➔ Omie) é o desta Central; a única caixa diferente é a do meio.
+As colunas do quadro **Solicitação de Faturamento [O.S.]** existem aqui com estes nomes:
+
+| coluna no Monday | campo na Central |
+|---|---|
+| Status | `situacao` — Novo · Em Análise Gestor · Faturar · Faturado · Recusado |
+| Link to Cliente | pelo `projeto` (o cliente é dono do projeto) |
+| Projeto Omie | `codigoProjeto` — copiado do projeto, nunca redigitado |
+| Departamento | `codigoDepartamento` — idem |
+| Valor O.S. (R$) | `valor` |
+| Vencimento | `vencimento` |
+| Status Aprovação Gestor | `papelExigido` + `aprovadoPor` + `aprovadoEm` |
+| Detalhes NFS-e | `numeroNfse` |
+| OS Omie | `numeroOs` |
+| Link Nota | `linkNfse` |
+| Status Omie | `statusOmie` — Pendente · Criado · Erro |
+| Mensagem Erro | `ultimoErro` |
+| Responsável | `responsavel` |
+| Arquivos | módulo `documents` do Core |
+
+## Alçadas (as faixas da Neotass)
+
+| faixa | quem aprova |
+|---|---|
+| até R$ 20 mil | Gerência de Conta |
+| R$ 20 mil a R$ 100 mil | **a confirmar com o cliente** — o desenho não define esta faixa |
+| acima de R$ 100 mil | Diretor de Operações **+** CFO (dois aprovadores) |
+
+São cadastro, não código: a Diretoria muda a faixa sem deploy. E a alçada é recusa de servidor —
+subir de etapa fora dela devolve 409, não um aviso de tela.
 
 ## O que a Central recusa fazer
 

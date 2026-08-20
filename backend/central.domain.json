@@ -235,8 +235,8 @@
           "required": true,
           "index": true,
           "values": [
-            "Coordenação",
-            "Gerência",
+            "Gerência de Conta",
+            "Diretor de Operações",
             "CFO",
             "Diretoria"
           ]
@@ -247,6 +247,16 @@
           "required": true,
           "index": true,
           "default": false
+        },
+        "papelSegundoAprovador": {
+          "kind": "enum",
+          "label": "Segundo aprovador",
+          "values": [
+            "Gerência de Conta",
+            "Diretor de Operações",
+            "CFO",
+            "Diretoria"
+          ]
         },
         "situacao": {
           "kind": "enum",
@@ -397,8 +407,8 @@
           "label": "Alçada exigida",
           "index": true,
           "values": [
-            "Coordenação",
-            "Gerência",
+            "Gerência de Conta",
+            "Diretor de Operações",
             "CFO",
             "Diretoria"
           ]
@@ -662,8 +672,8 @@
           "label": "Alçada exigida",
           "index": true,
           "values": [
-            "Coordenação",
-            "Gerência",
+            "Gerência de Conta",
+            "Diretor de Operações",
             "CFO",
             "Diretoria"
           ]
@@ -695,6 +705,16 @@
             "Personalizada"
           ]
         },
+        "vencimento": {
+          "kind": "date",
+          "label": "Vencimento",
+          "index": true
+        },
+        "responsavel": {
+          "kind": "string",
+          "label": "Responsável",
+          "index": true
+        },
         "dataPrevistaFaturamento": {
           "kind": "date",
           "label": "Previsão de faturamento",
@@ -722,12 +742,24 @@
         },
         "ultimoErro": {
           "kind": "string",
-          "label": "Último erro do Omie"
+          "label": "Mensagem de erro"
         },
         "idMonday": {
           "kind": "string",
           "label": "Item no Monday",
           "index": true
+        },
+        "statusOmie": {
+          "kind": "enum",
+          "label": "Status Omie",
+          "required": true,
+          "index": true,
+          "values": [
+            "Pendente",
+            "Criado",
+            "Erro"
+          ],
+          "default": "Pendente"
         },
         "situacao": {
           "kind": "enum",
@@ -735,14 +767,13 @@
           "required": true,
           "index": true,
           "values": [
-            "Rascunho",
-            "Em aprovação",
-            "Aprovada",
-            "Enviada ao ERP",
-            "Faturada",
-            "Recusada"
+            "Novo",
+            "Em Análise Gestor",
+            "Faturar",
+            "Faturado",
+            "Recusado"
           ],
-          "default": "Rascunho"
+          "default": "Novo"
         }
       },
       "singular": "solicitacaoFaturamento",

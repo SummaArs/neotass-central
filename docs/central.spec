@@ -39,7 +39,7 @@ painel visao / "A operação hoje" Início
     nota "Se este número não for zero, alguém precisa olhar hoje."
   indicador contagem SolicitacaoCompra "Compras esperando aprovação" onde situacao == Em aprovação
     nota "Paradas até alguém da alçada aprovar."
-  indicador contagem SolicitacaoFaturamento "Faturamentos esperando aprovação" onde situacao == Em aprovação
+  indicador contagem SolicitacaoFaturamento "Faturamentos esperando aprovação" onde situacao == Em Análise Gestor
     nota "Cada dia aqui é um dia sem nota emitida."
   indicador contagem Fornecedor "Fornecedores novos para analisar" onde situacao == Recebido
     nota "Chegaram pelo formulário público e ainda não foram ao Omie."
@@ -68,7 +68,7 @@ pagina tutorial /tutorial "Como operar"
   bloco "Um faturamento, do início ao fim" "Operação › Faturamento"
     texto "1. Novo ticket com cliente, projeto, valor e a aprovação do cliente anexada."
     texto "2. Arraste até Aprovada, dentro da alçada. A O.S. nasce em rascunho no Omie."
-    texto "3. Faturado no Omie, o cartão vira Faturada com o número da nota, e o PDF volta para o Monday."
+    texto "3. Faturado no Omie, o cartão vira Faturado com o número da nota, e o PDF volta para o Monday."
   bloco "O que a Central recusa fazer" "Isto não é limitação: é a regra escrita onde ninguém esquece dela."
     texto "Comprar acima do custo aprovado do projeto — nem de uma vez, nem fatiado em parcelas."
     texto "Faturar acima do que o cliente aprovou."
@@ -134,8 +134,8 @@ entidade Projeto
   campo custoAprovado moeda obrig "Custo aprovado do projeto"
   campo custoComprometido moeda = soma(ContaPagar.valor por projeto) onde situacao != Cancelada "Custo comprometido"
   campo saldoDeCompra moeda = custoAprovado - custoComprometido "Saldo para comprar"
-  campo receitaSolicitada moeda = soma(SolicitacaoFaturamento.valor por projeto) onde situacao != Recusada "Receita solicitada"
-  campo receitaFaturada moeda = soma(SolicitacaoFaturamento.valor por projeto) onde situacao == Faturada "Receita faturada"
+  campo receitaSolicitada moeda = soma(SolicitacaoFaturamento.valor por projeto) onde situacao != Recusado "Receita solicitada"
+  campo receitaFaturada moeda = soma(SolicitacaoFaturamento.valor por projeto) onde situacao == Faturado "Receita faturada"
   campo margemPrevista moeda = receitaAprovada - custoAprovado "Margem prevista"
   campo margemRealizada moeda = receitaFaturada - custoComprometido "Margem realizada"
   campo situacao fluxo [Em orçamento -> Aprovado -> Em execução -> Encerrado; Em orçamento -> Cancelado] obrig idx pad=Em orçamento "Situação"
@@ -150,9 +150,9 @@ entidade Projeto
   relacao faturamentos <- SolicitacaoFaturamento.projeto "Solicitações de faturamento"
   grade-relacionada compras: numero descricao valorEstimado cotacoesRecebidas menorCotacao situacao
   grade-relacionada contasPagar: numero fornecedor valor vencimento situacao
-  grade-relacionada faturamentos: numero descricaoServicos valor papelExigido situacao
+  grade-relacionada faturamentos: numero valor vencimento papelExigido statusOmie situacao
   invariante soma(ContaPagar.valor por projeto) <= custoAprovado onde situacao != Cancelada "A soma das contas a pagar não pode ultrapassar o custo aprovado do projeto."
-  invariante soma(SolicitacaoFaturamento.valor por projeto) <= receitaAprovada onde situacao != Recusada "Não é possível solicitar faturamento acima da receita aprovada pelo cliente neste projeto."
+  invariante soma(SolicitacaoFaturamento.valor por projeto) <= receitaAprovada onde situacao != Recusado "Não é possível solicitar faturamento acima da receita aprovada pelo cliente neste projeto."
   protege-exclusao ContaPagar.projeto "Não é possível excluir um projeto que já tem conta a pagar."
 
 entidade RegraAlcada
@@ -166,12 +166,13 @@ entidade RegraAlcada
   campo aplicaA enum(Compra|Faturamento|Ambos) obrig idx pad=Ambos "Aplica-se a"
   campo valorMinimo moeda obrig "Valor mínimo"
   campo valorMaximo moeda obrig "Valor máximo"
-  campo papelExigido enum(Coordenação|Gerência|CFO|Diretoria) obrig idx "Quem precisa aprovar"
+  campo papelExigido enum(Gerência de Conta|Diretor de Operações|CFO|Diretoria) obrig idx "Quem precisa aprovar"
   campo exigeDoisAprovadores bool obrig idx pad=false "Exige dois aprovadores"
+  campo papelSegundoAprovador enum(Gerência de Conta|Diretor de Operações|CFO|Diretoria) "Segundo aprovador"
   campo situacao enum(Ativa|Inativa) obrig idx pad=Ativa "Situação"
   colunas nome aplicaA valorMinimo valorMaximo papelExigido exigeDoisAprovadores situacao
   grupo Faixa: nome aplicaA valorMinimo valorMaximo
-  grupo Exigência: papelExigido exigeDoisAprovadores situacao
+  grupo Exigência: papelExigido exigeDoisAprovadores papelSegundoAprovador situacao
 
 entidade Fornecedor
   rotulo Fornecedores
@@ -212,7 +213,7 @@ entidade SolicitacaoCompra
   campo descricao texto obrig busca "Item ou serviço"
   campo projeto ref(Projeto) obrig idx "Projeto"
   campo valorEstimado moeda obrig "Valor estimado"
-  campo papelExigido enum(Coordenação|Gerência|CFO|Diretoria) idx "Alçada exigida"
+  campo papelExigido enum(Gerência de Conta|Diretor de Operações|CFO|Diretoria) idx "Alçada exigida"
   campo numero texto obrig unico busca "Número"
   campo codigoProjeto texto <- Projeto.codigo via projeto "Código do projeto"
   campo codigoDepartamento texto <- Projeto.codigoDepartamento via projeto "Código do departamento"
@@ -293,25 +294,28 @@ entidade SolicitacaoFaturamento
   campo numero texto obrig unico busca "Número"
   campo projeto ref(Projeto) obrig idx "Projeto"
   campo valor moeda obrig "Valor"
-  campo papelExigido enum(Coordenação|Gerência|CFO|Diretoria) idx "Alçada exigida"
+  campo papelExigido enum(Gerência de Conta|Diretor de Operações|CFO|Diretoria) idx "Alçada exigida"
   campo codigoProjeto texto <- Projeto.codigo via projeto "Código do projeto"
   campo codigoDepartamento texto <- Projeto.codigoDepartamento via projeto "Código do departamento"
   campo descricaoServicos texto obrig busca "Descrição dos serviços"
   campo condicaoPagamento enum(À vista|15 dias|30 dias|30/60|30/60/90|Personalizada) obrig "Condição de pagamento"
+  campo vencimento data idx "Vencimento"
+  campo responsavel texto idx "Responsável"
   campo dataPrevistaFaturamento data idx "Previsão de faturamento"
   campo aprovadoPor texto "Aprovado por"
   campo aprovadoEm data "Aprovado em"
   campo numeroOs texto "O.S. no Omie"
   campo numeroNfse texto "Número da NFS-e"
   campo linkNfse texto "PDF da NFS-e"
-  campo ultimoErro texto "Último erro do Omie"
+  campo ultimoErro texto "Mensagem de erro"
   campo idMonday texto idx "Item no Monday"
-  campo situacao fluxo [Rascunho -> Em aprovação -> Aprovada -> Enviada ao ERP -> Faturada; Em aprovação -> Recusada] obrig idx pad=Rascunho "Situação"
-  colunas numero projeto descricaoServicos valor papelExigido dataPrevistaFaturamento situacao
-  grupo Solicitação: numero projeto valor condicaoPagamento
+  campo statusOmie enum(Pendente|Criado|Erro) obrig idx pad=Pendente "Status Omie"
+  campo situacao fluxo [Novo -> Em Análise Gestor -> Faturar -> Faturado; Em Análise Gestor -> Recusado] obrig idx pad=Novo "Situação"
+  colunas numero projeto valor vencimento papelExigido responsavel statusOmie situacao
+  grupo Solicitação: numero projeto valor condicaoPagamento vencimento dataPrevistaFaturamento
   grupo Serviços 1col: descricaoServicos
-  grupo Aprovação: papelExigido aprovadoPor aprovadoEm dataPrevistaFaturamento
-  grupo Retorno do Omie: numeroOs numeroNfse linkNfse ultimoErro
+  grupo Aprovação: papelExigido aprovadoPor aprovadoEm responsavel
+  grupo Retorno do Omie: statusOmie numeroOs numeroNfse linkNfse ultimoErro
   grupo Tags do DRE: codigoProjeto codigoDepartamento
 
 pagina cadastros /cadastros "Cadastros"

@@ -155,7 +155,7 @@
           "kind": "count",
           "filters": {
             "situacao": {
-              "eq": "Em aprovação"
+              "eq": "Em Análise Gestor"
             }
           },
           "description": "Cada dia aqui é um dia sem nota emitida."
@@ -240,7 +240,7 @@
           "blocks": [
             {
               "type": "markdown",
-              "content": "1. Novo ticket com cliente, projeto, valor e a aprovação do cliente anexada.\n2. Arraste até Aprovada, dentro da alçada. A O.S. nasce em rascunho no Omie.\n3. Faturado no Omie, o cartão vira Faturada com o número da nota, e o PDF volta para o Monday."
+              "content": "1. Novo ticket com cliente, projeto, valor e a aprovação do cliente anexada.\n2. Arraste até Aprovada, dentro da alçada. A O.S. nasce em rascunho no Omie.\n3. Faturado no Omie, o cartão vira Faturado com o número da nota, e o PDF volta para o Monday."
             }
           ]
         },
@@ -687,9 +687,10 @@
             "relation": "faturamentos",
             "columns": [
               "numero",
-              "descricaoServicos",
               "valor",
+              "vencimento",
               "papelExigido",
+              "statusOmie",
               "situacao"
             ]
           }
@@ -755,12 +756,12 @@
                 "value": ""
               },
               {
-                "label": "Coordenação",
-                "value": "Coordenação"
+                "label": "Gerência de Conta",
+                "value": "Gerência de Conta"
               },
               {
-                "label": "Gerência",
-                "value": "Gerência"
+                "label": "Diretor de Operações",
+                "value": "Diretor de Operações"
               },
               {
                 "label": "CFO",
@@ -828,6 +829,7 @@
                 "fields": [
                   "papelExigido",
                   "exigeDoisAprovadores",
+                  "papelSegundoAprovador",
                   "situacao"
                 ],
                 "columns": 2
@@ -985,12 +987,12 @@
                 "value": ""
               },
               {
-                "label": "Coordenação",
-                "value": "Coordenação"
+                "label": "Gerência de Conta",
+                "value": "Gerência de Conta"
               },
               {
-                "label": "Gerência",
-                "value": "Gerência"
+                "label": "Diretor de Operações",
+                "value": "Diretor de Operações"
               },
               {
                 "label": "CFO",
@@ -1323,12 +1325,12 @@
                 "value": ""
               },
               {
-                "label": "Coordenação",
-                "value": "Coordenação"
+                "label": "Gerência de Conta",
+                "value": "Gerência de Conta"
               },
               {
-                "label": "Gerência",
-                "value": "Gerência"
+                "label": "Diretor de Operações",
+                "value": "Diretor de Operações"
               },
               {
                 "label": "CFO",
@@ -1337,6 +1339,29 @@
               {
                 "label": "Diretoria",
                 "value": "Diretoria"
+              }
+            ]
+          },
+          {
+            "field": "statusOmie",
+            "label": "Status Omie",
+            "type": "select",
+            "options": [
+              {
+                "label": "Todos",
+                "value": ""
+              },
+              {
+                "label": "Pendente",
+                "value": "Pendente"
+              },
+              {
+                "label": "Criado",
+                "value": "Criado"
+              },
+              {
+                "label": "Erro",
+                "value": "Erro"
               }
             ]
           },
@@ -1350,28 +1375,24 @@
                 "value": ""
               },
               {
-                "label": "Rascunho",
-                "value": "Rascunho"
+                "label": "Novo",
+                "value": "Novo"
               },
               {
-                "label": "Em aprovação",
-                "value": "Em aprovação"
+                "label": "Em Análise Gestor",
+                "value": "Em Análise Gestor"
               },
               {
-                "label": "Aprovada",
-                "value": "Aprovada"
+                "label": "Faturar",
+                "value": "Faturar"
               },
               {
-                "label": "Enviada ao ERP",
-                "value": "Enviada ao ERP"
+                "label": "Faturado",
+                "value": "Faturado"
               },
               {
-                "label": "Faturada",
-                "value": "Faturada"
-              },
-              {
-                "label": "Recusada",
-                "value": "Recusada"
+                "label": "Recusado",
+                "value": "Recusado"
               }
             ]
           }
@@ -1379,10 +1400,11 @@
         "columns": [
           "numero",
           "projeto",
-          "descricaoServicos",
           "valor",
+          "vencimento",
           "papelExigido",
-          "dataPrevistaFaturamento",
+          "responsavel",
+          "statusOmie",
           "situacao"
         ]
       },
@@ -1403,7 +1425,9 @@
                   "numero",
                   "projeto",
                   "valor",
-                  "condicaoPagamento"
+                  "condicaoPagamento",
+                  "vencimento",
+                  "dataPrevistaFaturamento"
                 ],
                 "columns": 2
               },
@@ -1420,13 +1444,14 @@
                   "papelExigido",
                   "aprovadoPor",
                   "aprovadoEm",
-                  "dataPrevistaFaturamento"
+                  "responsavel"
                 ],
                 "columns": 2
               },
               {
                 "label": "Retorno do Omie",
                 "fields": [
+                  "statusOmie",
                   "numeroOs",
                   "numeroNfse",
                   "linkNfse",
@@ -1476,12 +1501,12 @@
               "value": ""
             },
             {
-              "label": "Coordenação",
-              "value": "Coordenação"
+              "label": "Gerência de Conta",
+              "value": "Gerência de Conta"
             },
             {
-              "label": "Gerência",
-              "value": "Gerência"
+              "label": "Diretor de Operações",
+              "value": "Diretor de Operações"
             },
             {
               "label": "CFO",
@@ -1659,12 +1684,12 @@
               "value": ""
             },
             {
-              "label": "Coordenação",
-              "value": "Coordenação"
+              "label": "Gerência de Conta",
+              "value": "Gerência de Conta"
             },
             {
-              "label": "Gerência",
-              "value": "Gerência"
+              "label": "Diretor de Operações",
+              "value": "Diretor de Operações"
             },
             {
               "label": "CFO",
@@ -1673,6 +1698,29 @@
             {
               "label": "Diretoria",
               "value": "Diretoria"
+            }
+          ]
+        },
+        {
+          "field": "statusOmie",
+          "label": "Status Omie",
+          "type": "select",
+          "options": [
+            {
+              "label": "Todos",
+              "value": ""
+            },
+            {
+              "label": "Pendente",
+              "value": "Pendente"
+            },
+            {
+              "label": "Criado",
+              "value": "Criado"
+            },
+            {
+              "label": "Erro",
+              "value": "Erro"
             }
           ]
         },
@@ -1686,28 +1734,24 @@
               "value": ""
             },
             {
-              "label": "Rascunho",
-              "value": "Rascunho"
+              "label": "Novo",
+              "value": "Novo"
             },
             {
-              "label": "Em aprovação",
-              "value": "Em aprovação"
+              "label": "Em Análise Gestor",
+              "value": "Em Análise Gestor"
             },
             {
-              "label": "Aprovada",
-              "value": "Aprovada"
+              "label": "Faturar",
+              "value": "Faturar"
             },
             {
-              "label": "Enviada ao ERP",
-              "value": "Enviada ao ERP"
+              "label": "Faturado",
+              "value": "Faturado"
             },
             {
-              "label": "Faturada",
-              "value": "Faturada"
-            },
-            {
-              "label": "Recusada",
-              "value": "Recusada"
+              "label": "Recusado",
+              "value": "Recusado"
             }
           ]
         }
@@ -1716,10 +1760,11 @@
         "columns": [
           "numero",
           "projeto",
-          "descricaoServicos",
           "valor",
+          "vencimento",
           "papelExigido",
-          "dataPrevistaFaturamento",
+          "responsavel",
+          "statusOmie",
           "situacao"
         ]
       },
@@ -1740,7 +1785,9 @@
                   "numero",
                   "projeto",
                   "valor",
-                  "condicaoPagamento"
+                  "condicaoPagamento",
+                  "vencimento",
+                  "dataPrevistaFaturamento"
                 ],
                 "columns": 2
               },
@@ -1757,13 +1804,14 @@
                   "papelExigido",
                   "aprovadoPor",
                   "aprovadoEm",
-                  "dataPrevistaFaturamento"
+                  "responsavel"
                 ],
                 "columns": 2
               },
               {
                 "label": "Retorno do Omie",
                 "fields": [
+                  "statusOmie",
                   "numeroOs",
                   "numeroNfse",
                   "linkNfse",

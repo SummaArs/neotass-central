@@ -80,7 +80,7 @@
           "sourceField": "valor",
           "match": {
             "situacao": {
-              "neq": "Recusada"
+              "neq": "Recusado"
             }
           },
           "watchFields": [
@@ -98,7 +98,7 @@
           "sourceField": "valor",
           "match": {
             "situacao": {
-              "eq": "Faturada"
+              "eq": "Faturado"
             }
           },
           "watchFields": [
@@ -230,7 +230,7 @@
           "message": "Não é possível solicitar faturamento acima da receita aprovada pelo cliente neste projeto.",
           "match": {
             "situacao": {
-              "neq": "Recusada"
+              "neq": "Recusado"
             }
           }
         }
@@ -263,24 +263,20 @@
         "stageField": "situacao",
         "transitions": [
           {
-            "from": "Rascunho",
-            "to": "Em aprovação"
+            "from": "Novo",
+            "to": "Em Análise Gestor"
           },
           {
-            "from": "Em aprovação",
-            "to": "Aprovada"
+            "from": "Em Análise Gestor",
+            "to": "Faturar"
           },
           {
-            "from": "Aprovada",
-            "to": "Enviada ao ERP"
+            "from": "Faturar",
+            "to": "Faturado"
           },
           {
-            "from": "Enviada ao ERP",
-            "to": "Faturada"
-          },
-          {
-            "from": "Em aprovação",
-            "to": "Recusada"
+            "from": "Em Análise Gestor",
+            "to": "Recusado"
           }
         ]
       }
